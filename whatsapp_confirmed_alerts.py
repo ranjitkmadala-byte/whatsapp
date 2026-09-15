@@ -82,9 +82,19 @@ def send_test_message():
     h={"Authorization":f"Bearer {TOKEN}","Content-Type":"application/json"}
     text="WHATSAPP INTEGRATION TEST\nRailway -> Meta WhatsApp API connection successful."
     payload={"messaging_product":"whatsapp","to":TO,"type":"text","text":{"body":text}}
+    log.info("TEST CONFIG | phone_number_id=%s | to=%s | graph=%s", PHONE_ID, TO, GRAPH)
     x=requests.post(url,headers=h,json=payload,timeout=20)
-    x.raise_for_status()
-    log.info("TEST MESSAGE SENT | provider response=%s", x.json())
+    log.info("META HTTP STATUS | %s", x.status_code)
+    log.info("META RESPONSE | %s", x.text)
+    try:
+        x.raise_for_status()
+    except requests.HTTPError:
+        log.error("TEST SUBMISSION FAILED. Review META RESPONSE above.")
+        raise
+    data=x.json()
+    mid=(data.get("messages") or [{}])[0].get("id")
+    log.info("TEST SUBMITTED | message_id=%s", mid)
+    log.info("DELIVERY NOTE | API acceptance is not final delivery. Final sent/delivered/failed receipts require WhatsApp webhook status callbacks.")
 
 def main():
     setup()

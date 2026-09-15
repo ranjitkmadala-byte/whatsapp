@@ -24,3 +24,12 @@ ONE-TIME RAILWAY TEST:
 3. You should receive: WHATSAPP INTEGRATION TEST.
 4. After success, change SEND_TEST_MESSAGE=false and redeploy.
 The test run exits after sending one message, so it cannot repeatedly spam the phone.
+
+v1.2 DELIVERY DIAGNOSTICS
+- With SEND_TEST_MESSAGE=true, logs the Phone Number ID, recipient, Graph version,
+  HTTP status, full non-secret Meta response, and returned message ID.
+- Meta's POST /messages response confirms submission only.
+- Final sent/delivered/read/failed status is delivered asynchronously through
+  WhatsApp webhook callbacks; this package does not pretend a returned message ID means delivered.
+- If test is submitted but phone receives nothing, compare TEST CONFIG recipient with
+  the verified Meta test recipient and inspect Meta webhook/status/error tools.
