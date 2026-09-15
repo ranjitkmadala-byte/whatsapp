@@ -33,3 +33,5 @@ v1.2 DELIVERY DIAGNOSTICS
   WhatsApp webhook callbacks; this package does not pretend a returned message ID means delivered.
 - If test is submitted but phone receives nothing, compare TEST CONFIG recipient with
   the verified Meta test recipient and inspect Meta webhook/status/error tools.
+
+V1.3: SEND_TEST_MESSAGE=true sends Meta hello_world template. After receipt, set it false.
