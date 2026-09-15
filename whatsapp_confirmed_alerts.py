@@ -14,6 +14,7 @@ GRAPH=os.getenv("WHATSAPP_GRAPH_VERSION","v23.0")
 TEMPLATE=os.getenv("WHATSAPP_TEMPLATE_NAME","").strip()
 LANG=os.getenv("WHATSAPP_TEMPLATE_LANG","en_US")
 DRY=os.getenv("DRY_RUN","false").lower()=="true"
+SEND_TEST=os.getenv("SEND_TEST_MESSAGE","false").lower()=="true"
 logging.basicConfig(level=logging.INFO,format="%(asctime)s | %(levelname)s | %(message)s")
 log=logging.getLogger("wa-alert")
 
@@ -76,8 +77,23 @@ def open_market():
     n=datetime.now(IST)
     return n.weekday()<5 and dt(9,15)<=n.time()<=dt(15,35)
 
+def send_test_message():
+    url=f"https://graph.facebook.com/{GRAPH}/{PHONE_ID}/messages"
+    h={"Authorization":f"Bearer {TOKEN}","Content-Type":"application/json"}
+    text="WHATSAPP INTEGRATION TEST\nRailway -> Meta WhatsApp API connection successful."
+    payload={"messaging_product":"whatsapp","to":TO,"type":"text","text":{"body":text}}
+    x=requests.post(url,headers=h,json=payload,timeout=20)
+    x.raise_for_status()
+    log.info("TEST MESSAGE SENT | provider response=%s", x.json())
+
 def main():
-    setup();log.info("Confirmed-only monitor started")
+    setup()
+    if SEND_TEST:
+        log.info("SEND_TEST_MESSAGE=true | sending one-time WhatsApp test")
+        send_test_message()
+        log.info("Test complete. Set SEND_TEST_MESSAGE=false for normal monitoring.")
+        return
+    log.info("Confirmed-only monitor started")
     while True:
         try:
             if open_market():
